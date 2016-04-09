@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <title>Sanitas</title>
+  <meta name="description" content="A tracker of medical exams.">
+  <meta name="author" content="Dimitris Raviolos">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css" type="text/css" >
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+  <link rel="stylesheet" href="style.css">
+  <!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  <style>
+    body {
+      margin: 1% 10% 1% 10%;
+    }
+  </style>
+</head>
+
+<body></body>
+
+<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.js"></script>
+<script src="sanitas.js"></script>
+
+<script id="template" type="x-tmpl-mustache">
+<div>
+  <div class="row">
+    <div class="col-xs-4">
+      <div class="box-row">
+        {{tooltip}}
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="ct-chart {{type}}"></div>
+    </div>
+  </div>
+</div>
+</script>
+
+<script>
+function random(min, max) {
+    return Math.random() * (max - min) + min
+}
+
+var tpl = $('#template').html()
+
+for(var i = 0; i < Sanitas.length; i++) {
+  for(var test in Sanitas[i]) {
+
+    var options = Sanitas[i][test]()
+    options.type = test
+
+    var chart = {
+      low: options.min,
+      high: options.max
+    }
+
+    var data = {
+      series: [
+        [random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high)]
+      ]
+    }
+
+    var rendered = Mustache.render(tpl, options)
+    $('body').append(rendered)
+    new Chartist.Line('.' + test, data, chart)
+  }
+}
+</script>
+
+</html>
