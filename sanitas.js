@@ -111,10 +111,142 @@ var Sanitas = (function () {
         min: 0.6,
         max: 1.4
       }
+    },
+    UricAcid: function() {
+      return {
+        tooltip: "Ουρικό οξύ ορού",
+        min: 2.4,
+        max: 6
+      }
+    },
+    Cholesterol: function() {
+      return {
+        tooltip: "Χοληστερόλη ολική ορού",
+        min: 130,
+        max: 200
+      }
+    },
+    HDLChol: function() {
+      return {
+        tooltip: "Χοληστερόλη HDL ορού",
+        min: 50
+      }
+    },
+    LDLChol: function() {
+      return {
+        tooltip: "Χοληστερόλη LDL ορού",
+        max: 115
+      }
+    },
+    triglycerides: function() {
+      return {
+        tooltip: "Τριγλυκερίδια ορού",
+        max: 150
+      }
+    },
+    cacalcium: function() {
+      return {
+        tooltip: "Ασβέστιο ορού",
+        min: 8.4,
+        max: 10.1
+      }
+    },
+    kpotassium: function() {
+      return {
+        tooltip: "Κάλιο ορού",
+        min: 3.5,
+        max: 5.1
+      }
+    },
+    nasodium: function() {
+      return {
+        tooltip: "Νάτριο ορού",
+        min: 137,
+        max: 150
+      }
+    },
+    SGOTAST: function() {
+      return {
+        tooltip: "Οξαλοξεική τρανσαμινάση ορού",
+        min: 11,
+        max: 38
+      }
+    },
+    SGPTLAT: function() {
+      return {
+        tooltip: "Πυροσταφυλική τρανσαμινάση ορού",
+        min: 11,
+        max: 43
+      }
+    },
+    yGT: function() {
+      return {
+        tooltip: "Γ-γλουτάμυλο-τρασφεράση ορού",
+        min: 8,
+        max: 35
+      }
+    },
+    ALP: function() {
+      return {
+        tooltip: "Αλκαλική φωσφατάση ορού",
+        min: 23,
+        max: 104
+      }
     }
   }
 
+  var cyttarine = {
+    albumin: function() {
+      return {
+        tooltip: "Λευκωματίνες",
+        min: 55.8,
+        max: 66.1
+      }
+    },
+    alpha1: function() {
+      return {
+        tooltip: "Α1-σφαιρίνες",
+        min: 2.9,
+        max: 4.9
+      }
+    },
+    alpha2: function() {
+      return {
+        tooltip: "Α2-σφαιρίνες",
+        min: 7.1,
+        max: 11.8
+      }
+    },
+    beta: function() {
+      return {
+        tooltip: "Β-σφαιρίνες",
+        min: 8.4,
+        max: 13.1
+      }
+    },
+    gamma: function() {
+      return {
+        tooltip: "Γ-σφαιρίνες",
+        min: 11.1,
+        max: 18.8
+      }
+    },
+    ratioag: function() {
+      return {
+        tooltip: "Λευκωματικό Πηλίκο",
+        min: 1,
+        max: 2
+      }
+    },
+    totalprotein: function() {
+      return {
+        tooltip: "Ολικά λευκώματα",
+        min: 6.4,
+        max: 8.7
+      }
+    }
+  }
   // Reveal public methods
-  return [crp, blood, serum]
+  return [crp, blood, serum, cyttarine]
 
 })();

@@ -8,6 +8,17 @@ body {
   background: #EEE;
   line-height: 1.4rem;
 }
+
+input {
+  width: 80%;
+  height: 2em;
+  text-align: center;
+}
+
+.medical {
+  margin-bottom: 1%;
+}
+
 h1,
 h2,
 h3,
@@ -210,7 +221,7 @@ code {
   box-sizing: border-box;
   min-height: 1rem;
   margin-bottom: 0;
-  background: #007FFF;
+  background: #494975;
   border: 1px solid #FFF;
   border-radius: 2px;
   overflow: hidden;

@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css" type="text/css" >
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="style.css">
   <!--[if lt IE 9]>
   <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -16,22 +17,40 @@
   <![endif]-->
   <style>
     body {
+      font-family: 'Open Sans', sans-serif;
       margin: 1% 10% 1% 10%;
+      background-color: #EEEEF8;
+    }
+
+    .control:hover {
+      background-color: #8888A5;
+    }
+
+    .active {
+      background-color: #A7875D;
+    }
+
+    .controls {
+      margin-bottom: 1%;
     }
   </style>
 </head>
 
-<body></body>
+<body>
+  <div class="row controls col-xs-12">
+  </div>
+</body>
 
 <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pouchdb/5.3.1/pouchdb.min.js"></script>
 <script src="sanitas.js"></script>
 
 <script id="template" type="x-tmpl-mustache">
-<div>
+<div class="medical col-xs-12">
   <div class="row">
-    <div class="col-xs-4">
+    <div class="col-xs-12">
       <div class="box-row">
         {{tooltip}}
       </div>
@@ -42,38 +61,153 @@
       <div class="ct-chart {{type}}"></div>
     </div>
   </div>
+  <div class="row center-xs middle-xs">
+    <div class="col-xs-2">
+      <input type="text" placeholder="{{date}}" class="{{type}} date" value="{{date}}" name="date">
+    </div>
+    <div class="col-xs-2">
+      <input type="text" placeholder="5" class="{{type}} value" name="value">
+    </div>
+    <div class="col-xs-2">
+      <input type="submit" value="Submit" class="{{type}}">
+    </div>
+  </div>
 </div>
 </script>
 
+<script id="tab" type="x-tmpl-mustache">
+<div class="row tab{{tab}}"></div>
+</script>
+
+<script id="control" type="x-tmpl-mustache">
+<div class="col-xs-2 control box">{{control}}</div>
+</script>
+
 <script>
-function random(min, max) {
-    return Math.random() * (max - min) + min
+var charts = {}
+var db = new PouchDB('sanitas')
+
+PouchDB.sync('sanitas', 'http://couch.localtunnel.me/sanitas_fofi', {
+  live: true,
+  retry: true
+})
+
+$(document).ready(function () {
+  $("input[type='submit']").each(function(i, e) {
+
+    var c = $(e).attr('class')
+
+    $(e).click(function() {
+      var date = $("input[type='text'].date." + c).val()
+      var value = $("input[type='text'].value." + c).val()
+      var parts = date.split("/")
+      var dt = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10))
+
+      console.log(dt)
+      update(c, value, new Date(dt).toLocaleString('gr', {day: 'numeric', month: 'long', year: 'numeric'}))
+
+      /*
+      db.put({
+        _id: new Date().toISOString(),
+        type: c,
+        date: dt,
+        value: value
+      }).then(function (response) {
+        console.log(response)
+        update(c, value, new Date(dt).toLocaleString('gr', {day: 'numeric', month: 'long', year: 'numeric'}))
+      }).catch(function (err) {
+        console.log(err)
+      });
+      */
+    })
+  })
+
+  $('.control.box').each(function(i) {
+      $(this).click(function() {
+        $('[class*="tab"]').hide()
+        $('.tab' + i).show()
+        $('.control.box').removeClass('active')
+        $(this).addClass('active')
+      })
+  })
+})
+
+function current_date() {
+  var today = new Date()
+  var dd = today.getDate()
+  var mm = today.getMonth()+1 //January is 0!
+  var yyyy = today.getFullYear()
+
+  if(dd<10) {
+      dd='0'+dd
+  }
+
+  if(mm<10) {
+      mm='0'+mm
+  }
+
+  return mm+'/'+dd+'/'+yyyy
+}
+
+function update(test, data, label) {
+  var d = charts[test].data
+
+  d.labels.push(label)
+  d.series[0].push(data)
+
+  charts[test].update(d)
 }
 
 var tpl = $('#template').html()
+var tab = $('#tab').html()
+var control = $('#control').html()
 
 for(var i = 0; i < Sanitas.length; i++) {
   for(var test in Sanitas[i]) {
 
+    if($('.tab' + i).length == 0) {
+      var rendered_tab = Mustache.render(tab, {tab: i})
+      $('body').append(rendered_tab)
+      var rendered_control = Mustache.render(control, {control: 'Εξετάσεις ' + i, tab: i})
+      $('.controls').append(rendered_control)
+    }
+
     var options = Sanitas[i][test]()
     options.type = test
+    options.date = current_date()
 
-    var chart = {
-      low: options.min,
-      high: options.max
+    var chart = {}
+
+    if (options.min !== undefined) {
+      chart.low = options.min
     }
 
-    var data = {
-      series: [
-        [random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high), random(chart.low, chart.high)]
-      ]
+    if (options.max !== undefined) {
+      chart.high = options.max
     }
+
+    var data = { series: [[]] }
 
     var rendered = Mustache.render(tpl, options)
-    $('body').append(rendered)
-    new Chartist.Line('.' + test, data, chart)
+    $('.tab' + i).append(rendered)
+    charts[test] = new Chartist.Line('.' + test, data, chart)
   }
 }
+
+db.allDocs({
+  include_docs: true
+}).then(function(result) {
+  console.log(result)
+
+  for(var i = 0; i < result.rows.length; i++) {
+    var doc = result.rows[i].doc
+
+    update(doc.type, doc.value, new Date(doc.date).toLocaleString('gr', {day: 'numeric', month: 'long', year: 'numeric'}))
+  }
+}).catch(function (err) {
+  console.log(err)
+})
+
 </script>
 
 </html>
